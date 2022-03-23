@@ -36,7 +36,6 @@ Entity = function(param){
 }
 Entity.getFrameUpdateData = function() {
 
-var packs = Entity.getFrameUpdateData();
         var pack = {
 		initPack: {
                 player:initPack.player,
@@ -78,6 +77,9 @@ Player = function(param){
         self.hp = 100;
 	self.hpMax = 100;
 	self.score = 0;
+	self.inventory = new Inventory(param.socket);
+
+
 
 	var super_update = self.update;
 	self.update = function(){
@@ -156,6 +158,7 @@ map = 'field';
 	username: username,
         id: socket.id,
 	map: map,
+	socket:socket,
 	});
 	socket.on('keyPress',function(data){
 		if(data.inputId === 'left')

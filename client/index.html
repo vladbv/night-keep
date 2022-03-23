@@ -24,6 +24,7 @@ Change Map
 	<div id="chat-text" style="width:500px;height:100px; overflow-y:scroll">
 		<div>Hello!</div>
 	</div>
+	<div id="inventory"></div>
  
 	<form id="chat-form">
 		<input id="chat-input" type="text" style="width:500px"></input>
@@ -32,6 +33,7 @@ Change Map
 </div> 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js" integrity="sha512-MgkNs0gNdrnOM7k+0L+wgiRc5aLgl74sJQKbIWegVIMvVGPc1+gc1L2oK9Wf/D9pq58eqIJAxOonYPVE5UwUFA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/client/Inventory.js"></script>
 
 
 <script>
@@ -103,6 +105,13 @@ Change Map
 var changeMap = function() {
 socket.emit('changeMap');
 }
+
+
+var inventory = new Inventory(null);
+socket.on('updateInventory', function(items){
+inventory.items = items;
+inventory.refreshRender();
+});
 
 //game
 

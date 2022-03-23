@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 
 require('./Entity');
+require('./client/Inventory');
 
 var serv = require('http').Server(app);
 var mongojs = require("mongojs");
