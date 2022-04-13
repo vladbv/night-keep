@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 
+
 require('./Entity');
 require('./client/Inventory');
 require('./Database');
