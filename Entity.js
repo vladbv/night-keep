@@ -62,9 +62,7 @@ Entity.getFrameUpdateData = function() {
 }
 
 Player = function(param){
-
-	var self = Entity(param); // Entity is the Super Constructor
-	self.id = param.id;
+	var self = Entity(param);
 	self.number = "" + Math.floor(10 * Math.random());
 	self.username = param.username;
 	self.pressingRight = false;
@@ -74,35 +72,33 @@ Player = function(param){
 	self.pressingAttack = false;
 	self.mouseAngle = 0;
 	self.maxSpd = 10;
-        self.hp = 100;
-	self.hpMax = 100;
+	self.hp = 10;
+	self.hpMax = 10;
 	self.score = 0;
-	self.inventory = new Inventory(param.socket);
-
-
-
+	self.inventory = new Inventory(param.progress.items, param.socket,true);
+	
 	var super_update = self.update;
 	self.update = function(){
 		self.updateSpd();
+		
 		super_update();
- 
+		
 		if(self.pressingAttack){
 			self.shootBullet(self.mouseAngle);
 		}
 	}
 	self.shootBullet = function(angle){
-		 Bullet( {
-			parent: self.id,
+		if(Math.random() < 0.1)
+			self.inventory.addItem("potion",1);
+		Bullet({
+			parent:self.id,
 			angle:angle,
-			x: self.x,
-			y: self.y,
-			map: self.map,
-		} );
-//		b.x = self.x;
-//		b.y = self.y;
+			x:self.x,
+			y:self.y,
+			map:self.map,
+		});
 	}
- 
- 
+	
 	self.updateSpd = function(){
 		if(self.pressingRight)
 			self.spdX = self.maxSpd;
@@ -110,7 +106,7 @@ Player = function(param){
 			self.spdX = -self.maxSpd;
 		else
 			self.spdX = 0;
- 
+		
 		if(self.pressingUp)
 			self.spdY = -self.maxSpd;
 		else if(self.pressingDown)
@@ -118,6 +114,7 @@ Player = function(param){
 		else
 			self.spdY = 0;		
 	}
+	
 
 		self.getInitPack = function(){
 		return {
@@ -149,7 +146,7 @@ Player = function(param){
 
 }
 Player.list = {};
-Player.onConnect = function(socket, username){
+Player.onConnect = function(socket, username, progress){
 var map = 'forest';
 	if(Math.random() < 0.5){
 map = 'field'; 
@@ -159,7 +156,10 @@ map = 'field';
         id: socket.id,
 	map: map,
 	socket:socket,
+	progress: progress,	
 	});
+player.inventory.refreshRender();
+
 	socket.on('keyPress',function(data){
 		if(data.inputId === 'left')
 			player.pressingLeft = data.state;
@@ -225,6 +225,13 @@ Player.getAllInitPack = function(){
 }
 
 Player.onDisconnect = function(socket){
+    let player = Player.list[socket.id];
+    if(!player)
+        return;
+    Database.savePlayerProgress({
+        username: player.username,
+        items: player.inventory.items,
+    });
 	delete Player.list[socket.id];
 	delete removePack.player.push(socket.id);
 }
